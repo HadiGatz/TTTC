@@ -4,9 +4,11 @@ board = ['-' for i in range(9)]
 number_of_rounds = 0
 
 def handle_computer_turn():
-    random_tile = random.randint(0,8)
-    if board[random_tile] == '-':
-        board[random_tile] = 'O'
+    while True:
+        random_tile = random.randint(0,8)
+        if board[random_tile] == '-':
+            board[random_tile] = 'O'
+            break
 
 def print_board():
     counter = 0
@@ -16,15 +18,9 @@ def print_board():
         if (counter >= 3) and (counter % 3 == 0):
             print("\n")
 
-def handle_user_turn():
-    while True:
-        tile = int(input("Enter your tile: "))
-        if tile < 0 or tile > 8 or board[tile] != '-':
-            print("Error: pick a different tile.")
-            continue
-        break
-
-    board[tile] = 'X'
+def handle_user_turn(tile):
+    if board[tile] == '-':
+        board[tile] = 'X'
 
 
 
