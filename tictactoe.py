@@ -18,9 +18,12 @@ def print_board():
         if (counter >= 3) and (counter % 3 == 0):
             print("\n")
 
-def handle_user_turn(tile):
-    if board[tile] == '-':
-        board[tile] = 'X'
+def handle_user_turn():
+    while True:
+        tile = int(input("Enter your tile: "))
+        if board[tile] == '-' and tile >= 0 and tile <= 8:
+            board[tile] = 'X'
+            break
 
 
 
