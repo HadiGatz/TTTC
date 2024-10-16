@@ -3,13 +3,16 @@ class Board:
     def __init__(self):
         self.board = ['-' for i in range(9)]
     
-    def print_board(self):
+    def get_board(self):
         counter = 0
+        board_string = ""
         for i in range(9):
-            print(f"|{self.board[i]}|", end=" ")
+            board_string += f"|{self.board[i]}| "
             counter += 1
             if (counter >= 3) and (counter % 3 == 0):
-                print("\n")
+                board_string += ("\n")
+
+        return board_string
     
     def check_board_state(self):
         # X_WIN - x won
@@ -41,3 +44,6 @@ class Board:
             return True
         
         return False
+    
+    def check_tile(self, tile_num):
+        return self.board[tile_num] == '-' and tile_num >= 0 and tile_num <= 8

@@ -1,14 +1,16 @@
 import random
 from Board import *
+from TTTManager import *
 
 board = Board()
+manager = TTTManager(board)
 number_of_rounds = 0
 
 def handle_computer_turn():
     while True:
         random_tile = random.randint(0,8)
         if board.set_tile(random_tile, 'O'):
-            break
+            break                        
 
 
 def handle_user_turn():
@@ -54,5 +56,3 @@ if __name__ == "__main__":
 
         
         
-
-
