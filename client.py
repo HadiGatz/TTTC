@@ -21,21 +21,21 @@ def send_move_to_server(client, tile_type):
 
 while True:
     command = client.recv(1024).decode()
+
     current_board = client.recv(1024).decode()
     print(current_board)
 
     if command == "MOVE":
-        print("\nYour move")
-        send_move_to_server()
+        print("\nYour move\n")
+        send_move_to_server(client, tile_type)
     else:
-        print("\nWaiting for your opponent's move...")
+        print("\nWaiting for your opponent's move...\n")
 
     current_board = client.recv(1024).decode()
     print(current_board)
 
     current_game_state = client.recv(1024).decode()
     if current_game_state != "NO_RESULT":
-        print(current_game_state.replace("_", " "))
         break
 
 
