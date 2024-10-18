@@ -19,23 +19,34 @@ def send_move_to_server(client, tile_type):
     data = pickle.dumps((chosen_tile, tile_type))
     client.send(data)
 
+def connect_to_server():
+    client.connect((HOST, PORT))
+
+
 while True:
-    command = client.recv(1024).decode()
+    ready = input("\nAre you ready to play? [Y/N]: ").lower()
+    if ready == 'y':
+        connect_to_server()
 
-    current_board = client.recv(1024).decode()
-    print(current_board)
+        command = client.recv(1024).decode()
 
-    if command == "MOVE":
-        print("\nYour move\n")
-        send_move_to_server(client, tile_type)
+        current_board = client.recv(1024).decode()
+        print(current_board)
+
+        if command == "MOVE":
+            print("\nYour move\n")
+            send_move_to_server(client, tile_type)
+        else:
+            print("\nWaiting for your opponent's move...\n")
+
+        current_board = client.recv(1024).decode()
+        print(current_board)
+
+        current_game_state = client.recv(1024).decode()
+        if current_game_state != "NO_RESULT":
+            break
+    
     else:
-        print("\nWaiting for your opponent's move...\n")
-
-    current_board = client.recv(1024).decode()
-    print(current_board)
-
-    current_game_state = client.recv(1024).decode()
-    if current_game_state != "NO_RESULT":
         break
 
 
