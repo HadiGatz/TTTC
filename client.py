@@ -1,6 +1,7 @@
 import socket
 from Board import *
 from TTTManager import *
+import login_client
 import pickle
 
 board = Board()
@@ -8,6 +9,9 @@ manager = TTTManager(board)
 
 HOST = '192.168.68.104'
 PORT = 5555
+
+HOST_LOGIN = '192.168.68.104'
+PORT = 5557
 client = socket.socket()
     
 def send_move_to_server(client, tile_type):
@@ -20,6 +24,9 @@ def connect_to_server():
 
 
 while True:
+    login_client.handle_login(client)
+    random_id = client.recv(1024).decode()
+    
     ready = input("\nAre you ready to play? [Y/N]: ").lower()
     if ready == 'y':
         connect_to_server()

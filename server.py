@@ -12,6 +12,11 @@ server = socket.socket()
 server.bind((HOST, PORT))
 print("[RUNNING] Server is up and running")
 
+HOST_LOGIN = ''
+PORT_LOGIN = 5556
+connection_to_login_server = socket.socket()
+connection_to_login_server.bind((HOST, PORT_LOGIN))
+
 def send_board_to_players(board, player_1, player_2):
     current_board = board.get_board()
     player_1.send(current_board.encode())

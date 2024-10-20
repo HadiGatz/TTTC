@@ -1,11 +1,6 @@
 import socket
 import json  
 
-HOST = '192.168.68.104'
-PORT = 5556
-
-client = socket.socket()
-client.connect((HOST, PORT))
 
 def get_user_login_info():
     username = input("Enter your username: ")
@@ -13,19 +8,19 @@ def get_user_login_info():
 
     return {"username": username, "password": password}
 
-def send_user_login_info(info):
+def send_user_login_info(client, info):
     data = json.dumps(info)  
     client.sendall(data.encode())  
 
 def check_username(username):
     return len(username) >= 1 and len(username) <= 12
 
-def handle_new_user():
+def handle_new_user(client):
     username = input("Enter your username: ")
     if check_username(username):
         client.send(username.encode())
         password = input("Enter your password: ")
-        send_user_login_info({"username" : username, "password": password})
+        send_user_login_info(client, {"username" : username, "password": password})
 
         result = client.recv(1024).decode()
         if result == "SUCCESS":
@@ -33,14 +28,14 @@ def handle_new_user():
         
         elif result == "USERNAME_EXISTS":
             print("Your user already exists. Log In: ")
-            handle_existing_user()
+            handle_existing_user(client)
     else:
         pass
     
-def handle_existing_user():
+def handle_existing_user(client):
     user_info = get_user_login_info()
 
-    send_user_login_info(user_info)
+    send_user_login_info(client, user_info)
 
     result = client.recv(1024).decode()
 
@@ -50,13 +45,13 @@ def handle_existing_user():
         
     elif "USERNAME" in result:
         print("ERROR: no such username was found.")
-        handle_new_user()
+        handle_new_user(client)
     
     elif "PASSWORD" in result:
         print("ERROR: wrong password.")
-        retry_login(user_info["username"])
+        retry_login(client, user_info["username"])
 
-def retry_login(username):
+def retry_login(client, username):
     attempts = 3
     while attempts > 0:
         password = input(f"Enter your password ({attempts} attempts left): ")
@@ -69,12 +64,13 @@ def retry_login(username):
         attempts -= 1
     print("Too many failed attempts. Disconnecting...")
 
-def handle_login():
+def handle_login(client):
+    client.connect(('192.168.68.104', 5557))
     new_or_not = input("Do you have a registered user? [Y/N] ").lower()
 
     if new_or_not == 'y':
-        handle_existing_user()
+        handle_existing_user(client)
     else:
-        handle_new_user()
+        handle_new_user(client)
 
-handle_login()
+
