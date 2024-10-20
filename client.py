@@ -19,8 +19,9 @@ def send_move_to_server(client, tile_type):
     data = pickle.dumps((chosen_tile, tile_type))
     client.send(data)
 
-def connect_to_server():
+def connect_to_server(random_id):
     client.connect((HOST, PORT))
+    client.send((str(random_id)).encode())
 
 
 while True:
@@ -29,7 +30,7 @@ while True:
     
     ready = input("\nAre you ready to play? [Y/N]: ").lower()
     if ready == 'y':
-        connect_to_server()
+        connect_to_server(random_id)
         data = client.recv(1024).decode()
         tile_type = 'X' if data == "FIRST" else 'O'
         

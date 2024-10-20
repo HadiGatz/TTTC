@@ -16,6 +16,9 @@ HOST_LOGIN = ''
 PORT_LOGIN = 5556
 connection_to_login_server = socket.socket()
 connection_to_login_server.bind((HOST, PORT_LOGIN))
+print("[RUNNING] Login Server is up and running")
+
+logged_in_ids = []
 
 def send_board_to_players(board, player_1, player_2):
     current_board = board.get_board()
@@ -69,13 +72,28 @@ def main_game_server():
         print(f"[CONNECTION] {client_address}")
         active_players.append(client_socket)
 
+        player_random_id = client_socket.recv(1024).decode()
+        if player_random_id not in logged_in_ids:
+            client_socket.close()
+        
         if len(active_players) > 1:
             game = threading.Thread(target=run_game, args=(active_players[0], active_players[1]))
             active_players = active_players[2:]
 
             game.start()
 
-main_game_server()
+def login_server():
+    connection_to_login_server.listen()
+    client, address = connection_to_login_server.accept()
+    while True:
+        random_id = client.recv(1024).decode()
+        logged_in_ids.append(random_id)
+
+main_game_server_running = threading.Thread(target=main_game_server)
+login_server_running = threading.Thread(target=login_server)
+
+main_game_server_running.start()
+login_server_running.start()
 
 
     
