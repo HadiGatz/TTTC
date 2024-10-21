@@ -3,7 +3,6 @@ import hashlib
 import socket
 import json
 import random
-import select
 import threading
 
 HOST = ''
@@ -50,9 +49,10 @@ def check_for_users_password(cur, username, password):
     actual_password = cur.fetchone()
     return actual_password and actual_password[0] == hashed_password
 
-def retrieve_user_data_from_json(data):
-    user_data_json = json.loads(data)
-    return user_data_json["username"], user_data_json["password"]
+def retrieve_user_data_from_json(user_data_json):
+    username = user_data_json["username"]
+    password = user_data_json["password"]
+    return (username, password)
 
 def handle_login(client):
     con = sqlite3.connect("userdata.db")
@@ -86,15 +86,11 @@ def handle_login(client):
                 client.send("PASSWORD".encode())
         else:
             client.send("REGISTER".encode())
-            
             if check_username(username):
+                add_user(cur, con, username, password)  
                 client.send("SUCCESS".encode())  
-                password = client.recv(1024).decode()  
-
-                add_user(cur, con, username, password)
                 random_id = generate_random_number()
                 send_random_id_to_server_and_client(client, connection_to_game_server, random_id)
-
                 logged_in = True
 
 def login_server():
@@ -102,7 +98,7 @@ def login_server():
         server.listen()
         client, address = server.accept()
 
-        login_proccess = threading.Thread(target=handle_login, args=(client,))
-        login_proccess.start()
+        login_process = threading.Thread(target=handle_login, args=(client,))
+        login_process.start()
 
 login_server()

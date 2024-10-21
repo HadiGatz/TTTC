@@ -28,16 +28,13 @@ def handle_new_user(client):
             handle_existing_user(client)
         elif result == "REGISTER":
             print("You are registering as a new user.")
-            password = input("Enter a new password for your account: ")
-            client.sendall(password.encode()) 
-
+            client.send(password.encode())  
             result = client.recv(1024).decode()
             if result == "SUCCESS":
                 print("Registration successful. You are now logged in.")
 
 def handle_existing_user(client):
     user_info = get_user_login_info()
-
     send_user_login_info(client, user_info)
     result = client.recv(1024).decode()
 
@@ -71,3 +68,8 @@ def handle_login(client):
         handle_existing_user(client)
     else:
         handle_new_user(client)
+    
+    
+
+client = socket.socket()
+handle_login(client)
