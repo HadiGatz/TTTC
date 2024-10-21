@@ -19,7 +19,7 @@ def send_move_to_server(client, tile_type):
     data = pickle.dumps((chosen_tile, tile_type))
     client.send(data)
 
-def connect_to_server(client, random_id, username):
+def connect_to_server(client, random_id):
     client.connect((HOST, PORT))
     client.send((str(random_id)).encode())
 
@@ -39,6 +39,10 @@ while True:
         
             while True:
                 command = client.recv(1024).decode()
+                if command == "GAME_OVER":
+                    print("\nGame over!")
+                    client.close()
+                    break
 
                 current_board = client.recv(1024).decode()
                 print(current_board)

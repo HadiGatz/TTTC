@@ -60,7 +60,10 @@ def run_game(player_1, player_2):
 
             current_player, opponent = opponent, current_player
     else:
-        return
+        player_1.send("GAME_OVER".encode())
+        player_2.send("GAME_OVER".encode())
+        player_1.close()
+        player_2.close()
 
 
 def main_game_server():
