@@ -1,11 +1,9 @@
 import socket
-import json  
-
+import json
 
 def get_user_login_info():
     username = input("Enter your username: ")
     password = input("Enter your password: ")
-
     return {"username": username, "password": password}
 
 def send_user_login_info(client, info):
@@ -17,45 +15,46 @@ def check_username(username):
 
 def handle_new_user(client):
     username = input("Enter your username: ")
+    
     if check_username(username):
-        client.send(username.encode())
         password = input("Enter your password: ")
-        send_user_login_info(client, {"username" : username, "password": password})
+        send_user_login_info(client, {"username": username, "password": password})
 
         result = client.recv(1024).decode()
         if result == "SUCCESS":
             print("Success - You are logged in.")
-        
         elif result == "USERNAME_EXISTS":
-            print("Your user already exists. Log In: ")
+            print("Your user already exists. Please log in.")
             handle_existing_user(client)
-    else:
-        pass
-    
+        elif result == "REGISTER":
+            print("You are registering as a new user.")
+            password = input("Enter a new password for your account: ")
+            client.sendall(password.encode()) 
+
+            result = client.recv(1024).decode()
+            if result == "SUCCESS":
+                print("Registration successful. You are now logged in.")
+
 def handle_existing_user(client):
     user_info = get_user_login_info()
 
     send_user_login_info(client, user_info)
-
     result = client.recv(1024).decode()
 
     if result == "SUCCESS":
         print("Success - You are logged in.")
-        return
-        
-    elif "USERNAME" in result:
-        print("ERROR: no such username was found.")
-        handle_new_user(client)
-    
-    elif "PASSWORD" in result:
-        print("ERROR: wrong password.")
+    elif result == "PASSWORD":
+        print("ERROR: Wrong password.")
         retry_login(client, user_info["username"])
+    elif result == "REGISTER":
+        print("ERROR: No such username was found. Proceeding to register.")
+        handle_new_user(client)
 
 def retry_login(client, username):
     attempts = 3
     while attempts > 0:
         password = input(f"Enter your password ({attempts} attempts left): ")
-        send_user_login_info({"username": username, "password": password})
+        send_user_login_info(client, {"username": username, "password": password})
 
         result = client.recv(1024).decode()
         if result == "SUCCESS":
@@ -72,5 +71,3 @@ def handle_login(client):
         handle_existing_user(client)
     else:
         handle_new_user(client)
-
-
